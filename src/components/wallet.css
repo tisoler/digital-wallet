@@ -1,0 +1,16 @@
+.warning::before {
+  content: '\26A0';
+  padding-right: 2px;
+}
+
+.cancel::before {
+  content: '\2716';
+  color: red;
+  font-size: 17.5px;
+}
+
+.accept::before {
+  content: '\2714';
+  color: green;
+  font-size: 17.5px;
+}
