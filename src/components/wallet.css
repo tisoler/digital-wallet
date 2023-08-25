@@ -1,6 +1,7 @@
 .warning::before {
   content: '\26A0';
   padding-right: 2px;
+  color: #60272a;
 }
 
 .cancel::before {

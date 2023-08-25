@@ -1,12 +1,13 @@
 import { useGlobalContext } from "../context/globalContext"
 import { Exchange, Wallet } from "../types"
-import { ChangeEvent, useEffect, useState } from "react"
+import { ChangeEvent, useEffect, useMemo, useState } from "react"
 import './wallet.css'
 import WalletIcon from "../icons/wallet"
 import StarIcon from "../icons/star"
 import { STATUS } from "../constants"
 import Spinner from "./spinner"
 import EditIcon from "../icons/edit"
+import React from "react"
 
 type WalletProps = {
   wallet: Wallet,
@@ -21,7 +22,17 @@ const WalletComponent = ({ wallet, exchangeRates, }: WalletProps) => {
   const { globalWalletState: { status }, updateWallet } = useGlobalContext()
 
   useEffect(() => {
-    if(exchangeRates.length && !exchangeRate) setExchangeRate(exchangeRates[0])
+    const updatedExchangeRate = exchangeRates.find(er => er.id === exchangeRate?.id)
+    if (!exchangeRates.length) return
+    
+    if(!exchangeRate) {
+      // Initial load, takes first exchange rate
+      setExchangeRate(exchangeRates[0])
+    } else if(exchangeRate?.rate !== updatedExchangeRate?.rate) {
+      // Refresh exchange rate in wallet when it has been updated in the exchange component
+      // We enforce it because the mutation in the reducer modifies the exchange array and it does not refresh the local state automatically
+      setExchangeRate(updatedExchangeRate)
+    }
   }, [exchangeRates])
 
   const handleSetWalletBalance = (value: string) => {
@@ -91,7 +102,7 @@ const WalletComponent = ({ wallet, exchangeRates, }: WalletProps) => {
       {
         !!wallet?.isOld && (
           <div className="w-full bg-[#f2d6d9] py-1 px-4 mt-1 rounded-sm warning">
-            <label className='text-xs text-center text-white text-[#60272a]'>Wallet is old!</label>
+            <label className='text-xs text-center text-[#60272a]'>Wallet is old!</label>
           </div>
         )
       }
